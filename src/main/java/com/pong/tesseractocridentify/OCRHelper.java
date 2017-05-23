@@ -85,8 +85,8 @@ public class OCRHelper {
 	  
 	            while ((str = in.readLine()) != null)  
 	            {  
-	            	if(!"".equals(str)&&str.contains("."))
-	            		System.out.print(str+",");
+	            	if(!"".equals(str)&&str.contains("-"))
+	            		System.out.print("'"+str+"',");
 	                strB.append(str).append(EOL);  
 	            }  
 	            in.close();  

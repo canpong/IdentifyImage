@@ -25,7 +25,7 @@ public class Test {
                 i++ ;  
                 String recognizeText = new OCRHelper().recognizeText(file);  
                 System.out.println();
-                System.out.print(recognizeText+"\t");  
+//                System.out.print(recognizeText+"\t");  
   
                 if( i % 5  == 0 )  
                 {  
