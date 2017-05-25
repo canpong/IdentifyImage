@@ -23,7 +23,7 @@ public class Test {
             for(File file :testDataDir.listFiles())  
             {  
                 i++ ;  
-                String recognizeText = new OCRHelper().recognizeText(file);  
+//                String recognizeText = new OCRHelper().recognizeText(file);  
                 System.out.println();
 //                System.out.print(recognizeText+"\t");  
   
@@ -31,6 +31,7 @@ public class Test {
                 {  
                     System.out.println();  
                 }  
+                System.out.println("E2509B30B5B2471E8109EB221AC7A05D".length());
             }  
               
         } catch (Exception e)  

@@ -20,6 +20,8 @@ import org.jdesktop.swingx.util.OS;
 public class OCRHelper {
 		private final String LANG_OPTION = "-l";  
 	    private final String EOL = System.getProperty("line.separator");  
+	    private static StringBuilder dateBuilder = new StringBuilder();
+	    private static StringBuilder valueBuilder = new StringBuilder();
 	    /** 
 	     * Tesseract-OCR安装路径 
 	     */  
@@ -86,7 +88,9 @@ public class OCRHelper {
 	            while ((str = in.readLine()) != null)  
 	            {  
 	            	if(!"".equals(str)&&str.contains("-"))
-	            		System.out.print("'"+str+"',");
+	            		dateBuilder.append(("'"+str+"',"));
+	            	if(!"".equals(str)&&str.contains("."))
+	            		valueBuilder.append(str+",");
 	                strB.append(str).append(EOL);  
 	            }  
 	            in.close();  
@@ -110,6 +114,36 @@ public class OCRHelper {
 	            throw new RuntimeException(msg);  
 	        }  
 	        new File(outputFile.getAbsolutePath() + ".txt").delete();  
+	        dateBuilder.toString().replaceAll("\\s*", "");
+	        valueBuilder.toString().replaceAll("\\s*", "");
+	        String[] dates = dateBuilder.toString().split(",");
+	        int length = dates.length;
+	        String temp;
+	        for(int i = 0;i<length/2;i++){
+	        	temp = dates[i];
+	        	dates[i] = dates[length - 1 - i];
+	        	dates[length - 1 -i] = temp;
+	        }
+	        for(int i = 1;i<=dates.length;i++){
+	        	System.out.print(dates[i-1]+",");
+	        	if(i%5 == 0){
+	        		System.out.println();
+	        	}
+	        }
+	        String[] values = valueBuilder.toString().split(",");
+	        length = values.length;
+	        for(int i = 0;i<length/2;i++){
+	        	temp = values[i];
+	        	values[i] = values[length - 1 - i];
+	        	values[length - 1 -i] = temp;
+	        }
+	        System.out.println();
+	        for(int i = 1;i<values.length;i++){
+	        	System.out.print(values[i-1]+",");
+	        	if(i%10 == 0){
+	        		System.out.println();
+	        	}
+	        }
 	        return strB.toString().replaceAll("\\s*", "");  
 	    }  
 }
