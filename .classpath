@@ -12,7 +12,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.7.0_80">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdksetup">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
@@ -24,5 +24,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="jai_imageio-1.1.jar"/>
 	<classpathentry kind="lib" path="swingx-1.6.1.jar"/>
+	<classpathentry kind="lib" path="ojdbc6.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
