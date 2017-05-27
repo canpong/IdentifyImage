@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import com.pong.db.util.Conn;
 import com.pong.help.util.BeanHelper;
@@ -17,6 +18,7 @@ public class App
     public static void main( String[] args )
     {
     	HelperTest();
+//    	System.out.println(Math.random());
     }
     
     public static void DBTest(){
@@ -47,7 +49,7 @@ public class App
     }
     
     public static void HelperTest(){
-    	BeanHelper bh = new BeanHelper("GOLDPRICE");
-    	bh.getTableMetaData();
+//    	BeanHelper bh = new BeanHelper("GOLDPRICE");
+//    	bh.getTableMetaData();
     }
 }
