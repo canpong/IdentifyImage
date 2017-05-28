@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.pong.tesseractocridentify;
+package com.pong.identify;
 
 import java.io.File;
 

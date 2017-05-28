@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class Conn {
 	private static String user = "scott";
 	private static String password = "123456";
-	private static String url = "jdbc:oracle:thin:@127.0.0.1:1521:demo";
+	private static String url = "jdbc:oracle:thin:@192.168.0.106:1521:demo";
 	private static Connection conn = null;
 	public static Connection getConn(){
 		try {
