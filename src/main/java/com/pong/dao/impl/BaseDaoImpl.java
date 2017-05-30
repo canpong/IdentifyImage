@@ -3,15 +3,20 @@
  */
 package com.pong.dao.impl;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.pong.dao.BaseDao;
 import com.pong.db.util.Conn;
+import com.pong.reflect.common.DateFormat;
 
 /**
  * @Description
@@ -35,6 +40,22 @@ public class BaseDaoImpl<T> implements BaseDao<T>{
 		}
 	}
 	
+
+	public List<T> Query(String sql, Object[] values) throws Exception {
+		System.out.println("========== "+sql+" ===========");
+		Connection conn = getConn();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ps = conn.prepareStatement(sql);
+		setParameters(ps,values);
+		ps.execute();
+		rs = ps.executeQuery();
+		List<T> list = new ArrayList<T>();
+		list = getResultList(rs);
+		close(conn,ps);
+		return list;
+	}
+
 	public void Add(String sql,Object[] values) throws Exception{
 		System.out.println("========== "+sql+" ===========");
 		Connection conn = getConn();
@@ -75,6 +96,84 @@ public class BaseDaoImpl<T> implements BaseDao<T>{
 		close(conn,ps);
 	
 	}
+	
+	public List<T> getResultList(ResultSet rs) throws Exception {
+		ParameterizedType type = (ParameterizedType)this.getClass().getGenericSuperclass();
+		Class<T> clazz = (Class<T>)type.getActualTypeArguments()[0];
+		List<T> list = new ArrayList<T>();
+		ResultSetMetaData  rsmd = rs.getMetaData();
+		while(rs.next()){
+			T oneBean = (T) clazz.newInstance();
+			T bean = null;
+			for(int i = 0;i<rsmd.getColumnCount();i++){
+				bean = createBean(oneBean,rsmd.getColumnName(i+1),rs.getString(i+1));
+			}
+			list.add(bean);
+		}
+	
+		return list;
+	}
+	public <T> T createBean(T oneBean,String... args) throws InstantiationException, IllegalAccessException{
+//		T oneBean = (T) clazz.newInstance();
+		for(int i = 0 ;i<args.length;){
+			try {
+				invokeSetMethod(oneBean,args[i++],args[i++]);
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+		return oneBean;
+		
+	}
+	
+	public void invokeSetMethod(Object oneBean,String fieldName,String args) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		for(Method oneMethod : oneBean.getClass().getMethods()){
+			if(oneMethod.getName().replace("set", "").equalsIgnoreCase(fieldName)){
+				Class<?> [] x = oneMethod.getParameterTypes();
+				
+				if(!checkMethodIsAnnotation(oneBean,oneMethod,args)){//the method is not be annotation set value normally
+					if(x[0].getName().equalsIgnoreCase("java.lang.String")){
+						oneMethod.invoke(oneBean, args);
+					}else if(x[0].getName().equalsIgnoreCase("java.Integer")||x[0].getName().equalsIgnoreCase("int")){
+						oneMethod.invoke(oneBean, args != null ? Integer.valueOf(args) : 0);
+					}else if(x[0].getName().equalsIgnoreCase("java.lang.Double")||x[0].getName().equalsIgnoreCase("double")){
+						oneMethod.invoke(oneBean, args != null ? Double.valueOf(args) : 0);
+					}
+				}
+			}
+		}
+	}
+	
+	public boolean checkMethodIsAnnotation(Object oneBean,Method method,String args) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		if(method.isAnnotationPresent(DateFormat.class)){
+			//require now annotation and check method is null or not
+			DateFormat resource = method.getAnnotation(DateFormat.class);
+			String name = "";
+			Object value = null;
+			if(resource.name()!=null && !"".equals(resource.name())){
+				//require value of annation class method name
+				name = resource.name();
+				if("yyyy-MM-dd".equalsIgnoreCase(name)){
+					if(args != null && args.length() >= 10){
+						value = args.substring(0, 10);
+					}
+				}else{
+					value = args;
+				}
+			}else{//value of method name is null then default value is ""
+				value = "";
+			}
+			//allow to access private method  
+			method.setAccessible(true);
+			//set value to bean  
+			method.invoke(oneBean, value);
+			return true;
+		}
+		return false;
+	}
+	
 	
 	protected Connection getConn(){
 		Connection conn = Conn.getConn();
@@ -118,6 +217,5 @@ public class BaseDaoImpl<T> implements BaseDao<T>{
 			}
 		}
 	}
-
 
 }

@@ -2,6 +2,8 @@ package com.pong.entity;
 
 import java.io.Serializable;
 
+import com.pong.reflect.common.DateFormat;
+
 /**
  * @Description GoldPrice entity bean associated with table GOLDPRICE
  * @author canpong
@@ -40,11 +42,17 @@ public class GoldPrice implements Serializable{
 	public String getAdduser(){
 		return this.adduser;
 	}
+	@DateFormat(name = "yyyy-MM-dd")
 	public void setDay(String day){
 		this.day = day;
 	}
 	public String getDay(){
 		return this.day;
+	}
+	
+	@Override
+	public String toString(){
+		return "guid:"+guid+" day:"+day+" price:"+price+" adduser:"+adduser+" adddate:"+adddate;
 	}
 
 }

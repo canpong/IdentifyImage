@@ -14,6 +14,7 @@ import java.util.List;
  * @version
  */
 public interface BaseDao<T> {
+	public List<T> Query(String sql,Object[] values) throws Exception;
 	public void Add(String sql,Object[] values) throws Exception;
 	public void AddBatch(String sql,List<Object[]> listValues) throws Exception;
 	public void Delete(String sql,Object[] values) throws Exception;

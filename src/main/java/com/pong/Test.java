@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.pong.dao.impl.GoldPriceDaoImpl;
 import com.pong.db.util.Conn;
+import com.pong.entity.GoldPrice;
 import com.pong.help.util.BeanHelper;
 import com.pong.identify.OCRHelper;
 
@@ -26,18 +27,7 @@ public class Test
 //    	DBTest();
 //    	HelperTest();
 //    	DaoTest();
-    	IdentifyImageTest();
-    	List<Object[]> listValues = new ArrayList<Object[]>();
-    	if(dayList.size() == priceList.size()){
-    		for(int i=0,size = dayList.size();i<size;i++){
-    			listValues.add(new Object[]{java.sql.Date.valueOf(dayList.get(i).toString()),Double.valueOf(priceList.get(i)),"canpong"});
-    		}
-    	}
-    	GoldPriceDaoImpl gpd = new GoldPriceDaoImpl();
-    	String addSql = "insert into goldprice(day,price,adduser) values(?,?,?)";
-    	gpd.AddBatch(addSql, listValues);
-//    	String delSql = "delete from goldprice";
-//    	gpd.Delete(delSql, new Object[]{});
+    	insertIntoDBFromImage();
     }
     
     public static void DBTest(){
@@ -74,10 +64,33 @@ public class Test
     
     public static void DaoTest() throws Exception{
     	GoldPriceDaoImpl gpd = new GoldPriceDaoImpl();
-    	String delSql = "delete from goldprice";
-    	gpd.Delete(delSql, new Object[]{});
+    	String sql = "select * from GOLDPRICE ";
+    	List<GoldPrice> list = gpd.Query(sql, new Object[]{});
+    	for(int i = 0;i<list.size();i++){
+    		System.out.println(list.get(i));
+    	}
+//    	String delSql = "delete from goldprice";
+//    	gpd.Delete(delSql, new Object[]{});
+//    	String addSql = "insert into goldprice(day,price,adduser) values(?,?,?)";
+//    	gpd.Add(addSql, new Object[]{java.sql.Date.valueOf("2017-05-28"),80.02,"canpong"});
+    }
+    
+    public static void insertIntoDBFromImage(){
+    	IdentifyImageTest();
+    	List<Object[]> listValues = new ArrayList<Object[]>();
+    	if(dayList.size() == priceList.size()){
+    		for(int i=0,size = dayList.size();i<size;i++){
+    			listValues.add(new Object[]{java.sql.Date.valueOf(dayList.get(i).toString()),Double.valueOf(priceList.get(i)),"canpong"});
+    		}
+    	}
+    	GoldPriceDaoImpl gpd = new GoldPriceDaoImpl();
     	String addSql = "insert into goldprice(day,price,adduser) values(?,?,?)";
-    	gpd.Add(addSql, new Object[]{java.sql.Date.valueOf("2017-05-28"),80.02,"canpong"});
+    	try {
+			gpd.AddBatch(addSql, listValues);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     public static void IdentifyImageTest(){
@@ -93,4 +106,6 @@ public class Test
     		e.printStackTrace();
     	}
     }
+    
+    
 }
