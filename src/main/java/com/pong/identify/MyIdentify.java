@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.pong.main;
+package com.pong.identify;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

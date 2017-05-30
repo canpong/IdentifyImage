@@ -1,15 +1,17 @@
 /**
  * 
  */
-package com.pong.tesseractocridentify;
+package com.pong.identify;
 import java.io.BufferedReader;  
-
 import java.io.File;  
 import java.io.FileInputStream;  
 import java.io.InputStreamReader;  
 import java.util.ArrayList;  
+import java.util.LinkedHashSet;
 import java.util.List;  
   
+import java.util.Set;
+
 import org.jdesktop.swingx.util.OS;  
 /**
  * @Description
@@ -20,8 +22,8 @@ import org.jdesktop.swingx.util.OS;
 public class OCRHelper {
 		private final String LANG_OPTION = "-l";  
 	    private final String EOL = System.getProperty("line.separator");  
-	    private static StringBuilder dateBuilder = new StringBuilder();
-	    private static StringBuilder valueBuilder = new StringBuilder();
+	    public List<String> dayList= new ArrayList<String>();
+	    public List<String> priceList= new ArrayList<String>();
 	    /** 
 	     * Tesseract-OCR安装路径 
 	     */  
@@ -88,9 +90,9 @@ public class OCRHelper {
 	            while ((str = in.readLine()) != null)  
 	            {  
 	            	if(!"".equals(str)&&str.contains("-"))
-	            		dateBuilder.append(("'"+str+"',"));
+	            		dayList.add(str.replaceAll("\\s*", ""));//可以替换大部分空白字符， 不限于空格 \s 可以匹配空格、制表符、换页符等空白字符的其中任意一个 
 	            	if(!"".equals(str)&&str.contains("."))
-	            		valueBuilder.append(str+",");
+	            		priceList.add(str.replaceAll("\\s*", ""));
 	                strB.append(str).append(EOL);  
 	            }  
 	            in.close();  
@@ -114,36 +116,7 @@ public class OCRHelper {
 	            throw new RuntimeException(msg);  
 	        }  
 	        new File(outputFile.getAbsolutePath() + ".txt").delete();  
-	        dateBuilder.toString().replaceAll("\\s*", "");
-	        valueBuilder.toString().replaceAll("\\s*", "");
-	        String[] dates = dateBuilder.toString().split(",");
-	        int length = dates.length;
-	        String temp;
-	        for(int i = 0;i<length/2;i++){
-	        	temp = dates[i];
-	        	dates[i] = dates[length - 1 - i];
-	        	dates[length - 1 -i] = temp;
-	        }
-	        for(int i = 1;i<=dates.length;i++){
-	        	System.out.print(dates[i-1]+",");
-	        	if(i%5 == 0){
-	        		System.out.println();
-	        	}
-	        }
-	        String[] values = valueBuilder.toString().split(",");
-	        length = values.length;
-	        for(int i = 0;i<length/2;i++){
-	        	temp = values[i];
-	        	values[i] = values[length - 1 - i];
-	        	values[length - 1 -i] = temp;
-	        }
-	        System.out.println();
-	        for(int i = 1;i<values.length;i++){
-	        	System.out.print(values[i-1]+",");
-	        	if(i%10 == 0){
-	        		System.out.println();
-	        	}
-	        }
+//	        System.out.println();
 	        return strB.toString().replaceAll("\\s*", "");  
 	    }  
 }

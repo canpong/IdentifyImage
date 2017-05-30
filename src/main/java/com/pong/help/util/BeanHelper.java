@@ -3,6 +3,10 @@
  */
 package com.pong.help.util;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import com.pong.db.util.Conn;
 
@@ -30,34 +35,63 @@ public class BeanHelper implements Serializable{
 	private String beanName;
 	private String packagePath;
 	private String author;
-	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:SSS");
-	private static String TAB = "/t";
-	private static String NEXT_LINE = "/r/n";
+	private String filePath;
+	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	private static String TAB = "\t";
+	private static String NEXT_LINE = "\r\n";
 	private Map<String,String> map = new HashMap<String,String>();
-	public BeanHelper(String tableName,String beanName,String packagePath,String author){
+	
+	public BeanHelper(String tableName,String beanName,String packagePath,String author,String filePath){
 		this.tableName = tableName;
 		this.beanName = beanName;
 		this.packagePath = packagePath;
 		this.author = author;
+		this.filePath = filePath;
 	}
 	
 	public void go(){
-		
+		String path = System.getProperty("user.dir")+"\\src\\main\\java"+filePath;
+	
+		try {
+			
+			OutputStream out = new FileOutputStream(path+"\\"+beanName+".java");
+			String entityString = generateCode();
+			out.write(entityString.getBytes());
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public void generateCode(){
+	public String generateCode(){
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("package "+packagePath+NEXT_LINE+NEXT_LINE);
+		stringBuilder.append("package "+packagePath+";"+NEXT_LINE+NEXT_LINE);
 		stringBuilder.append("import java.io.Serializable;"+NEXT_LINE+NEXT_LINE);
 		stringBuilder.append("/**"+NEXT_LINE);
-		stringBuilder.append(" * @Description"+NEXT_LINE);
+		stringBuilder.append(" * @Description "+beanName+" entity bean associated with table "+tableName+NEXT_LINE);
 		stringBuilder.append(" * @author "+author+NEXT_LINE);
-		stringBuilder.append(" * @@date "+sdf.format(new Date())+NEXT_LINE);
-		stringBuilder.append(" */");
+		stringBuilder.append(" * @date "+sdf.format(new Date())+NEXT_LINE);
+		stringBuilder.append(" */"+NEXT_LINE);
 		stringBuilder.append("public class "+beanName+" implements Serializable{"+NEXT_LINE+NEXT_LINE);
-		stringBuilder.append(TAB+"private static final long serialVersionUID = - 1L"+NEXT_LINE);
+		stringBuilder.append(TAB+"private static final long serialVersionUID = - "+String.valueOf(Math.abs(UUID.randomUUID().getMostSignificantBits()))+"L;"+NEXT_LINE);
 		getTableMetaData();
-		
+		for(Map.Entry<String, String> entry : map.entrySet()){
+			stringBuilder.append(TAB+"private "+entry.getValue()+" "+entry.getKey()+";"+NEXT_LINE);
+		}
+		stringBuilder.append(NEXT_LINE);
+		for(Map.Entry<String, String> entry : map.entrySet()){
+			stringBuilder.append(TAB+"public void set"+toUpperCase(entry.getKey())+"("+entry.getValue()+" "+entry.getKey()+"){"+NEXT_LINE);
+			stringBuilder.append(TAB+TAB+"this."+entry.getKey()+" = "+entry.getKey()+";"+NEXT_LINE);
+			stringBuilder.append(TAB+"}"+NEXT_LINE);
+			stringBuilder.append(TAB+"public "+entry.getValue()+" get"+toUpperCase(entry.getKey())+"(){"+NEXT_LINE);
+			stringBuilder.append(TAB+TAB+"return this."+entry.getKey()+";"+NEXT_LINE);
+			stringBuilder.append(TAB+"}"+NEXT_LINE);
+		}
+		stringBuilder.append(NEXT_LINE);
+		stringBuilder.append("}");
+		return stringBuilder.toString();
 	}
 	
 	public void getTableMetaData(){
@@ -80,6 +114,12 @@ public class BeanHelper implements Serializable{
 		for(int i = 0;i<chars.length;i++){
 			chars[i] = Character.toLowerCase(chars[i]);
 		}
+		return new String(chars);
+	}
+	
+	private String toUpperCase(String columnName){
+		char[] chars = columnName.toCharArray();
+		chars[0] = Character.toUpperCase(chars[0]);
 		return new String(chars);
 	}
 	
